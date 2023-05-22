@@ -3,6 +3,8 @@ package com.doctorplus.controller;
 //Aquí codificamos los getter/setter de la clase AuthenticationRequest
 
 public class AuthenticationRequest {
+
+	
 	private String id; 
 
     private String password;
