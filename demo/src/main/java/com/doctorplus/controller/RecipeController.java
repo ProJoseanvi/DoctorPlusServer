@@ -87,4 +87,19 @@ public class RecipeController {
 		}
 	
 	}
+	
+	@GetMapping("/recipe/search")
+	public ResponseEntity<ResponseAction> search(@RequestHeader (name="Authorization") String bearerToken, @RequestBody RecipeSearchRequest recipeSearchRequest) {
+	    //ResponseD
+		String token = bearerToken.substring(7);
+		
+		//List<String> result = recipesDao.search(recipeSearchRequest);
+		/*if (result si no esta vacio) {
+			return ResponseEntity.ok(new ResponseAction("ok", "Receta creada correctamente."));
+		}else {
+			return ResponseEntity.ok(new ResponseAction("error", "Error al crear la receta."));
+		}*/
+		return ResponseEntity.ok(new ResponseAction("error", "Error al crear la receta."));
+	
+	}
 }

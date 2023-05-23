@@ -13,6 +13,7 @@ public class Recipe extends RecipeRequest{
 		this.date = r.getDate();
 		this.med = r.getMed();
 		this.takes = r.getTakes();
+		this.med = r.getMed();
 	}
 	public String getUserId() {
 		return userId;

@@ -39,9 +39,9 @@ public class RecipesDao extends ConnectionDao{
 	
 	private PreparedStatement create(Connection con, Recipe recipe) throws SQLException {
 	    String sql = "INSERT INTO Recetas ( "
-                + " Receta_id, Paciente_id, Tomas_diarias, Fecha_receta, Usuario_id " 
+                + " Receta_id, Paciente_id, Tomas_diarias, Fecha_receta, Usuario_id, Nombre_medicamento " 
                 + ") VALUES ("
-                + "?,?,?,?,?"
+                + "?,?,?,?,?,?"
                 + ");";
 	    PreparedStatement ps = con.prepareStatement(sql);
 	    int i = 1;
@@ -50,6 +50,7 @@ public class RecipesDao extends ConnectionDao{
 	    ps.setString(i++, recipe.getTakes());
 	    ps.setString(i++, recipe.getDate());
 	    ps.setString(i++, recipe.getUserId());
+	    ps.setString(i++, recipe.getMed());
 	    return ps;
 	}
 
