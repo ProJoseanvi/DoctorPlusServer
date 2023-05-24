@@ -1,5 +1,9 @@
 package com.doctorplus.controller;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(Include.NON_NULL)
 public class RecipeRequest {
 	
 	protected String id;
@@ -7,6 +11,7 @@ public class RecipeRequest {
 	protected String date;
 	protected String med;
 	protected String takes;
+	
 	
 	public String getId() {
 		return id;

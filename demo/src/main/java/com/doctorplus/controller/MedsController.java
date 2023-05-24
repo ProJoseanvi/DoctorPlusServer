@@ -64,23 +64,4 @@ public class MedsController {
         return response;
     }
 	
-	/*@PostMapping("/receta")
-	public ResponseEntity<String> crearReceta(@RequestBody Receta receta) {
-	    
-		// Realizamos las validaciones necesarias
-	    if (receta.getRecetaId() == null || receta.getRecetaId().isEmpty()) {
-	        return ResponseEntity.badRequest().body("El receta_id es obligatorio");
-	    }
-
-	    // habría que crear aquí las acciones necesarias para crear la receta en la bd
-
-	    // devolvemos respuesta exitosa
-	    return ResponseEntity.ok("Receta creada exitosamente");
-	
-	}
-	
-	    
-	}
-
-	 */
 }

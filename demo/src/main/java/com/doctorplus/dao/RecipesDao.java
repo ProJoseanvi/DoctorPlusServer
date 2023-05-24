@@ -4,54 +4,180 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.doctorplus.controller.LoginController;
+import com.doctorplus.controller.RecipeRequest;
+import com.doctorplus.controller.RecipeSearchRequest;
+import com.doctorplus.dto.Med;
 
 // Aquí codoficamos el DAO de la clase medicamentos, en este caso un GET para obtener mediante la conexión a la API lo que queremos de nuestra BD
 
-
 import com.doctorplus.dto.Medicamento;
+import com.doctorplus.dto.Patient;
 import com.doctorplus.dto.Recipe;
 import com.doctorplus.dto.User;
 
 @Repository
-public class RecipesDao extends ConnectionDao{ 
-	
+public class RecipesDao extends ConnectionDao {
+
 	private static final Logger logger = LogManager.getLogger(RecipesDao.class);
 
 	public boolean create(Recipe recipe) {
 		boolean result = false;
-	    try (Connection conn = this.getConnection();
-	         PreparedStatement ps = create(conn, recipe)){
-	    	int rows = ps.executeUpdate(); 
-	    	result = rows == 1; 
-	    } catch (Exception e) {
-	    	logger.error(e);
-	    }
-	    return result;
-		
-	} 
-	
+		try (Connection conn = this.getConnection(); PreparedStatement ps = create(conn, recipe)) {
+			int rows = ps.executeUpdate();
+			result = rows == 1;
+		} catch (Exception e) {
+			logger.error(e);
+		}
+		return result;
+
+	}
+
 	private PreparedStatement create(Connection con, Recipe recipe) throws SQLException {
-	    String sql = "INSERT INTO Recetas ( "
-                + " Receta_id, Paciente_id, Tomas_diarias, Fecha_receta, Usuario_id, Nombre_medicamento " 
-                + ") VALUES ("
-                + "?,?,?,?,?,?"
-                + ");";
-	    PreparedStatement ps = con.prepareStatement(sql);
-	    int i = 1;
-	    ps.setString(i++, recipe.getId());
-	    ps.setInt(i++, recipe.getPatientId());
-	    ps.setString(i++, recipe.getTakes());
-	    ps.setString(i++, recipe.getDate());
-	    ps.setString(i++, recipe.getUserId());
-	    ps.setString(i++, recipe.getMed());
-	    return ps;
+		String sql = "INSERT INTO Recetas ( "
+				+ " Receta_id, Paciente_id, Tomas_diarias, Fecha_receta, Usuario_id, Nombre_medicamento " + ") VALUES ("
+				+ "?,?,?,?,?,?" + ");";
+		PreparedStatement ps = con.prepareStatement(sql);
+		int i = 1;
+		ps.setString(i++, recipe.getId());
+		ps.setInt(i++, recipe.getPatientId());
+		ps.setString(i++, recipe.getTakes());
+		ps.setString(i++, recipe.getDate());
+		ps.setString(i++, recipe.getUserId());
+		ps.setString(i++, recipe.getMed());
+		return ps;
+	}
+
+	public List<Recipe> list(RecipeRequest recipeRequest, String idUser) {
+		List<Recipe> result = new ArrayList<>();
+
+		try (Connection conn = this.getConnection();
+				PreparedStatement ps = list(conn, recipeRequest, idUser);
+				ResultSet rs = ps.executeQuery()) {
+			while (rs.next()) {
+				Recipe rec = new Recipe();
+				rec.setId(rs.getString("Receta_id"));
+				result.add(rec);
+			}
+		} catch (Exception e) {
+			logger.error(e);
+		}
+
+		return result;
+	}
+
+	private PreparedStatement list(Connection con, RecipeRequest recipeRequest, String idUser) throws SQLException {
+		String sql = "SELECT Receta_id " + "FROM Recetas " + "WHERE Usuario_id = ?";
+		if (StringUtils.hasLength(recipeRequest.getId())) {
+			sql += "AND Receta_id = ?";
+		}
+		if (StringUtils.hasLength(recipeRequest.getDate())) {
+			sql += "AND Fecha_receta = ?";
+		}
+		if (recipeRequest.getPatientId() != null) {
+			sql += "AND Paciente_id = ?";
+		}
+		int i = 1;
+		PreparedStatement ps = con.prepareStatement(sql);
+		ps.setString(i++, idUser);
+		if (StringUtils.hasLength(recipeRequest.getId())) {
+			ps.setString(i++, recipeRequest.getId());
+		}
+		if (StringUtils.hasLength(recipeRequest.getDate())) {
+			ps.setString(i++, recipeRequest.getDate());
+		}
+		if (recipeRequest.getPatientId() != null) {
+			ps.setInt(i++, recipeRequest.getPatientId());
+		}
+		return ps;
+	}
+
+	public List<Patient> listPatients(RecipeRequest recipeRequest, String idUser) {
+		List<Patient> result = new ArrayList<>();
+
+		try (Connection conn = this.getConnection();
+				PreparedStatement ps = listPatients(conn, recipeRequest, idUser);
+				ResultSet rs = ps.executeQuery()) {
+			while (rs.next()) {
+				Patient rec = new Patient();
+				rec.setId(rs.getInt("Paciente_id"));
+				result.add(rec);
+			}
+		} catch (Exception e) {
+			logger.error(e);
+		}
+
+		return result;
+	}
+
+	private PreparedStatement listPatients(Connection con, RecipeRequest recipeRequest, String idUser)
+			throws SQLException {
+		String sql = "SELECT DISTINCT Paciente_id " + "FROM Recetas " + "WHERE Usuario_id = ?";
+		if (StringUtils.hasLength(recipeRequest.getId())) {
+			sql += "AND Receta_id = ?";
+		}
+		if (StringUtils.hasLength(recipeRequest.getDate())) {
+			sql += "AND Fecha_receta = ?";
+		}
+		int i = 1;
+		PreparedStatement ps = con.prepareStatement(sql);
+		ps.setString(i++, idUser);
+		if (StringUtils.hasLength(recipeRequest.getId())) {
+			ps.setString(i++, recipeRequest.getId());
+		}
+		if (StringUtils.hasLength(recipeRequest.getDate())) {
+			ps.setString(i++, recipeRequest.getDate());
+		}
+		return ps;
+	}
+
+	public List<Recipe> listDates(RecipeRequest recipeRequest, String idUser) {
+		List<Recipe> result = new ArrayList<>();
+
+		try (Connection conn = this.getConnection();
+				PreparedStatement ps = listDates(conn, recipeRequest, idUser);
+				ResultSet rs = ps.executeQuery()) {
+			while (rs.next()) {
+				Recipe rec = new Recipe();
+				rec.setDate(rs.getString("Fecha_receta"));
+				result.add(rec);
+			}
+		} catch (Exception e) {
+			logger.error(e);
+		}
+
+		return result;
+	}
+
+	private PreparedStatement listDates(Connection con, RecipeRequest recipeRequest, String idUser)
+			throws SQLException {
+		String sql = "SELECT DISTINCT Fecha_receta " + "FROM Recetas " + "WHERE Usuario_id = ?";
+		if (StringUtils.hasLength(recipeRequest.getId())) {
+			sql += "AND Receta_id = ?";
+		}
+		if (recipeRequest.getPatientId() != null) {
+			sql += "AND Paciente_id = ?";
+		}
+		int i = 1;
+		PreparedStatement ps = con.prepareStatement(sql);
+		ps.setString(i++, idUser);
+		if (StringUtils.hasLength(recipeRequest.getId())) {
+			ps.setString(i++, recipeRequest.getId());
+		}
+		if (recipeRequest.getPatientId() != null) {
+			ps.setInt(i++, recipeRequest.getPatientId());
+		}
+		return ps;
 	}
 
 }

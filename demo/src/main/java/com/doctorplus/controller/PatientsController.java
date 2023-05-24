@@ -25,10 +25,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.doctorplus.dao.MedsDao;
 import com.doctorplus.dao.PatientsDao;
+import com.doctorplus.dao.RecipesDao;
 import com.doctorplus.dao.UsersDao;
 import com.doctorplus.dto.Med;
 import com.doctorplus.dto.User;
 import com.doctorplus.dto.Patient;
+import com.doctorplus.dto.Recipe;
 import com.doctorplus.service.InMemoryUsers;
 import com.doctorplus.service.JwtTokenService;
 import com.doctorplus.service.JwtUserDetailsService;
@@ -49,40 +51,36 @@ public class PatientsController {
 	@Autowired
 	private JwtTokenService jwtTokenService;
 	
-	
 	@Autowired
 	private PatientsDao patientsDao;
+
+	@Autowired
+	private UsersDao usersDao;
+	
+	@Autowired
+	private RecipesDao recipesDao;
 		
-	@GetMapping("/patients/list")
+	@GetMapping("/patient/list")
     public ListPatientsResponse list(@RequestHeader (name="Authorization") String bearerToken) {
 		ListPatientsResponse response = new ListPatientsResponse();
 		String token = bearerToken.substring(7);
     	logger.info("user token: " + token);
-    	
-    	List<Patient> meds = patientsDao.list();
-    	response.setPatients(meds);
-    	
+    	List<Patient> patients = patientsDao.list();
+    	response.setPatients(patients);
         
         return response;
     }
 	
-	/*@PostMapping("/receta")
-	public ResponseEntity<String> crearReceta(@RequestBody Receta receta) {
-	    
-		// Realizamos las validaciones necesarias
-	    if (receta.getRecetaId() == null || receta.getRecetaId().isEmpty()) {
-	        return ResponseEntity.badRequest().body("El receta_id es obligatorio");
-	    }
-
-	    // habría que crear aquí las acciones necesarias para crear la receta en la bd
-
-	    // devolvemos respuesta exitosa
-	    return ResponseEntity.ok("Receta creada exitosamente");
+	@PostMapping("/patient/listByRecipe")
+    public ListPatientsResponse listByRecipe(@RequestHeader (name="Authorization") String bearerToken, @RequestBody RecipeRequest recipeRequest) {
+		ListPatientsResponse response = new ListPatientsResponse();
+		String token = bearerToken.substring(7);
+    	logger.info("user token: " + token);
+    	String idUser = usersDao.getIdByToken(token); 
+    	List<Patient> patients = recipesDao.listPatients(recipeRequest, idUser);
+    	response.setPatients(patients);
+        
+        return response;
+    }
 	
-	}
-	
-	    
-	}
-
-	 */
 }

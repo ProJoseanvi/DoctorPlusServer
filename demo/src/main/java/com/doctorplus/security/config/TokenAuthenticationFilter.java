@@ -2,12 +2,12 @@ package com.doctorplus.security.config;
 
 import java.io.IOException;
 
-import org.apache.tomcat.jakartaee.commons.lang3.StringUtils;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.util.StringUtils;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -36,7 +36,7 @@ public final class TokenAuthenticationFilter extends AbstractAuthenticationProce
 			new BadCredentialsException("Missing Authentication Token");
 		}
 
-		String token = StringUtils.removeStart(param, BEARER);
+		String token = param.substring(7);
 
 		final Authentication auth = new UsernamePasswordAuthenticationToken(token, token);
 		return getAuthenticationManager().authenticate(auth);

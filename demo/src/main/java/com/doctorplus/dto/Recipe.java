@@ -6,6 +6,10 @@ public class Recipe extends RecipeRequest{
 	
 	private String userId;
 	
+	public Recipe() {
+		super();
+	}
+	
 	public Recipe(String userId, RecipeRequest r) {
 		this.userId = userId;
 		this.id = r.getId();

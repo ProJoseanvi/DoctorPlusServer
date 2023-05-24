@@ -1,6 +1,7 @@
 package com.doctorplus.controller;
 
 import java.util.Calendar;
+import java.util.List;
 import java.text.SimpleDateFormat;
 
 import org.apache.logging.log4j.LogManager;
@@ -88,18 +89,30 @@ public class RecipeController {
 	
 	}
 	
-	@GetMapping("/recipe/search")
-	public ResponseEntity<ResponseAction> search(@RequestHeader (name="Authorization") String bearerToken, @RequestBody RecipeSearchRequest recipeSearchRequest) {
-	    //ResponseD
+	@PostMapping("/recipe/ids")
+	public ResponseListRecipes getListIds(@RequestHeader (name="Authorization") String bearerToken, @RequestBody RecipeRequest recipeRequest) {
+		ResponseListRecipes result = new ResponseListRecipes();
 		String token = bearerToken.substring(7);
-		
-		//List<String> result = recipesDao.search(recipeSearchRequest);
-		/*if (result si no esta vacio) {
-			return ResponseEntity.ok(new ResponseAction("ok", "Receta creada correctamente."));
-		}else {
-			return ResponseEntity.ok(new ResponseAction("error", "Error al crear la receta."));
-		}*/
-		return ResponseEntity.ok(new ResponseAction("error", "Error al crear la receta."));
-	
+		String idUser = usersDao.getIdByToken(token); 
+		List<Recipe> recipes = recipesDao.list(recipeRequest, idUser);
+		result.setRecipes(recipes);
+		return result;
 	}
+	
+	@PostMapping("/recipe/dates")
+	public ResponseListRecipes getListDates(@RequestHeader (name="Authorization") String bearerToken, @RequestBody RecipeRequest recipeRequest) {
+		ResponseListRecipes result = new ResponseListRecipes();
+		String token = bearerToken.substring(7);
+		String idUser = usersDao.getIdByToken(token); 
+		List<Recipe> recipes = recipesDao.listDates(recipeRequest, idUser);
+		result.setRecipes(recipes);
+		return result;
+	}
+
+	private void getListRecipes(RecipeRequest recipeRequest) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
 }
