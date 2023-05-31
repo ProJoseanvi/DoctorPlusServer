@@ -59,7 +59,7 @@ public class SecurityConfig {
 	
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		logger.info("filterChainChtulhu");
+		//logger.info("filterChainChtulhu");
 		
 		/*return http
 				.csrf().disable()

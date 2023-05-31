@@ -15,8 +15,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -108,6 +111,47 @@ public class RecipeController {
 		result.setRecipes(recipes);
 		return result;
 	}
+	
+	@PostMapping("/recipe/get")
+	public ResponseRecipe get(@RequestHeader (name="Authorization") String bearerToken, @RequestBody RecipeRequest recipeRequest) {
+		ResponseRecipe result = new ResponseRecipe();
+		String token = bearerToken.substring(7);
+		String idUser = usersDao.getIdByToken(token); 
+		result = recipesDao.get(recipeRequest, idUser);
+		
+		return result;
+	}
+	
+	@DeleteMapping("/recipe/delete/{idRecipe}")
+	public ResponseEntity<ResponseAction> get(@RequestHeader (name="Authorization") String bearerToken, @PathVariable  String idRecipe) {
+		String token = bearerToken.substring(7);
+		String idUser = usersDao.getIdByToken(token); 
+		
+		//boolean result = recipesDao.delete(idUser, idRecipe);
+		boolean result = true;
+		if (result) {
+			return ResponseEntity.ok(new ResponseAction("ok", "Receta borrada correctamente: " + idRecipe));
+		}else {
+			return ResponseEntity.ok(new ResponseAction("error", "Error al borrar la receta."));
+		}
+	}
+	
+	//@PutMapping("/recipe/change")
+	//public ResponseEntity<ResponseAction> change(@RequestHeader (name="Authorization") String bearerToken, @RequestBody RecipeRequest recipeRequest) {
+	@PutMapping("/recipe/change/{idRecipe}/{state}")
+	public ResponseEntity<ResponseAction> change(@RequestHeader (name="Authorization") String bearerToken, @PathVariable String idRecipe, @PathVariable Integer state) {
+		String token = bearerToken.substring(7);
+		String idUser = usersDao.getIdByToken(token); 
+		
+		//boolean result = recipesDao.changeState(recipeRequest.getState(), idRecipe);
+		boolean result = true;
+		if (result) {
+			return ResponseEntity.ok(new ResponseAction("ok", "Receta cambiada de estado correctamente: " + idRecipe + " " + state));
+		}else {
+			return ResponseEntity.ok(new ResponseAction("error", "Error al cambiar de estado la receta."));
+		}
+	}
+
 
 	private void getListRecipes(RecipeRequest recipeRequest) {
 		// TODO Auto-generated method stub

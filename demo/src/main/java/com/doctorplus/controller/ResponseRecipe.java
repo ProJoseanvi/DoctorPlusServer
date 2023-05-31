@@ -3,15 +3,17 @@ package com.doctorplus.controller;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonInclude(Include.NON_NULL)
-public class RecipeRequest {
+public class ResponseRecipe {
 
 	protected String id;
-	protected Integer patientId;
+	protected String patientName;
 	protected String date;
 	protected String med;
 	protected String takes;
+	protected Integer state;
 
 	public String getId() {
 		return id;
@@ -21,13 +23,13 @@ public class RecipeRequest {
 		this.id = id;
 	}
 
-	@JsonAlias("patient_id")
-	public Integer getPatientId() {
-		return patientId;
+	@JsonProperty("patient_name")
+	public String getPatientName() {
+		return patientName;
 	}
 
-	public void setPatientId(Integer patientId) {
-		this.patientId = patientId;
+	public void setPatientName(String patientName) {
+		this.patientName = patientName;
 	}
 
 	public String getDate() {
@@ -38,6 +40,7 @@ public class RecipeRequest {
 		this.date = date;
 	}
 
+	@JsonProperty("medication_name")
 	public String getMed() {
 		return med;
 	}
@@ -46,12 +49,21 @@ public class RecipeRequest {
 		this.med = med;
 	}
 
+	@JsonProperty("number_takes")
 	public String getTakes() {
 		return takes;
 	}
 
 	public void setTakes(String takes) {
 		this.takes = takes;
+	}
+
+	public void setState(int state) {
+		this.state = state;
+	}
+	
+	public Integer getState() {
+		return this.state;
 	}
 
 }

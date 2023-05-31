@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 import com.doctorplus.controller.LoginController;
 import com.doctorplus.controller.RecipeRequest;
 import com.doctorplus.controller.RecipeSearchRequest;
+import com.doctorplus.controller.ResponseRecipe;
 import com.doctorplus.dto.Med;
 
 // Aquí codoficamos el DAO de la clase medicamentos, en este caso un GET para obtener mediante la conexión a la API lo que queremos de nuestra BD
@@ -111,6 +112,7 @@ public class RecipesDao extends ConnectionDao {
 			while (rs.next()) {
 				Patient rec = new Patient();
 				rec.setId(rs.getInt("Paciente_id"));
+				rec.setName(rs.getString("Nombre_paciente"));
 				result.add(rec);
 			}
 		} catch (Exception e) {
@@ -122,12 +124,18 @@ public class RecipesDao extends ConnectionDao {
 
 	private PreparedStatement listPatients(Connection con, RecipeRequest recipeRequest, String idUser)
 			throws SQLException {
-		String sql = "SELECT DISTINCT Paciente_id " + "FROM Recetas " + "WHERE Usuario_id = ?";
+		String sql = "SELECT DISTINCT p.Paciente_id, p.Nombre_paciente "
+				+ "FROM Recetas r "
+				+ "INNER JOIN Pacientes p ON p.Paciente_id = r.Paciente_id "
+				+ "WHERE Usuario_id = ? ";
 		if (StringUtils.hasLength(recipeRequest.getId())) {
-			sql += "AND Receta_id = ?";
+			sql += "AND Receta_id = ? ";
 		}
 		if (StringUtils.hasLength(recipeRequest.getDate())) {
-			sql += "AND Fecha_receta = ?";
+			sql += "AND Fecha_receta = ? ";
+		}
+		if (recipeRequest.getPatientId() != null) {
+			sql += "AND p.Paciente_id = ? ";
 		}
 		int i = 1;
 		PreparedStatement ps = con.prepareStatement(sql);
@@ -137,6 +145,9 @@ public class RecipesDao extends ConnectionDao {
 		}
 		if (StringUtils.hasLength(recipeRequest.getDate())) {
 			ps.setString(i++, recipeRequest.getDate());
+		}
+		if (recipeRequest.getPatientId() != null) {
+			ps.setInt(i++, recipeRequest.getPatientId());
 		}
 		return ps;
 	}
@@ -177,6 +188,46 @@ public class RecipesDao extends ConnectionDao {
 		if (recipeRequest.getPatientId() != null) {
 			ps.setInt(i++, recipeRequest.getPatientId());
 		}
+		return ps;
+	}
+
+	public ResponseRecipe get(RecipeRequest recipeRequest, String idUser) {
+		ResponseRecipe result = new ResponseRecipe();
+
+		try (Connection conn = this.getConnection();
+				PreparedStatement ps = get(conn, recipeRequest, idUser);
+				ResultSet rs = ps.executeQuery()) {
+			if (rs.next()) {
+				result.setId(rs.getString("Receta_id"));
+				result.setMed(rs.getString("Nombre_medicamento"));
+				result.setPatientName(rs.getString("Nombre_paciente"));
+				result.setDate(rs.getString("Fecha_receta"));
+				result.setTakes(rs.getString("Tomas_diarias"));
+				result.setState(rs.getInt("Estado_receta"));
+			}
+		} catch (Exception e) {
+			logger.error(e);
+		}
+
+		return result;
+	}
+	
+	private PreparedStatement get(Connection con, RecipeRequest recipeRequest, String idUser)
+			throws SQLException {
+		String sql = "select r.Receta_id, r.Paciente_id, r.Tomas_diarias, r.Fecha_receta, r.Estado_receta, r.Nombre_medicamento, p.Nombre_paciente " + 
+				" from Recetas r " +
+				" inner join Pacientes p on r.Paciente_id = p.Paciente_id " +
+				" where r.Receta_id = ? " +
+ 				" and r.Paciente_id = ? " +
+				" and r.Fecha_receta = ?";
+		
+		int i = 1;
+		PreparedStatement ps = con.prepareStatement(sql);
+		
+		ps.setString(i++, recipeRequest.getId());
+		ps.setInt(i++, recipeRequest.getPatientId());
+		ps.setString(i++, recipeRequest.getDate());
+
 		return ps;
 	}
 
