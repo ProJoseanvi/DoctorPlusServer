@@ -77,7 +77,7 @@ public class PatientsController {
 		String token = bearerToken.substring(7);
     	logger.info("user token: " + token);
     	String idUser = usersDao.getIdByToken(token); 
-    	List<Patient> patients = recipesDao.listPatients(recipeRequest, idUser);
+    	List<Patient> patients = recipesDao.listPatients(recipeRequest);
     	response.setPatients(patients);
         
         return response;

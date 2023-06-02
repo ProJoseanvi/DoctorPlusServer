@@ -59,11 +59,11 @@ public class RecipesDao extends ConnectionDao {
 		return ps;
 	}
 
-	public List<Recipe> list(RecipeRequest recipeRequest, String idUser) {
+	public List<Recipe> list(RecipeRequest recipeRequest) {
 		List<Recipe> result = new ArrayList<>();
 
 		try (Connection conn = this.getConnection();
-				PreparedStatement ps = list(conn, recipeRequest, idUser);
+				PreparedStatement ps = list(conn, recipeRequest);
 				ResultSet rs = ps.executeQuery()) {
 			while (rs.next()) {
 				Recipe rec = new Recipe();
@@ -77,8 +77,8 @@ public class RecipesDao extends ConnectionDao {
 		return result;
 	}
 
-	private PreparedStatement list(Connection con, RecipeRequest recipeRequest, String idUser) throws SQLException {
-		String sql = "SELECT Receta_id " + "FROM Recetas " + "WHERE Usuario_id = ?";
+	private PreparedStatement list(Connection con, RecipeRequest recipeRequest) throws SQLException {
+		String sql = "SELECT Receta_id " + "FROM Recetas " + "WHERE 1=1 ";
 		if (StringUtils.hasLength(recipeRequest.getId())) {
 			sql += "AND Receta_id = ?";
 		}
@@ -90,7 +90,6 @@ public class RecipesDao extends ConnectionDao {
 		}
 		int i = 1;
 		PreparedStatement ps = con.prepareStatement(sql);
-		ps.setString(i++, idUser);
 		if (StringUtils.hasLength(recipeRequest.getId())) {
 			ps.setString(i++, recipeRequest.getId());
 		}
@@ -103,11 +102,11 @@ public class RecipesDao extends ConnectionDao {
 		return ps;
 	}
 
-	public List<Patient> listPatients(RecipeRequest recipeRequest, String idUser) {
+	public List<Patient> listPatients(RecipeRequest recipeRequest) {
 		List<Patient> result = new ArrayList<>();
 
 		try (Connection conn = this.getConnection();
-				PreparedStatement ps = listPatients(conn, recipeRequest, idUser);
+				PreparedStatement ps = listPatients(conn, recipeRequest);
 				ResultSet rs = ps.executeQuery()) {
 			while (rs.next()) {
 				Patient rec = new Patient();
@@ -122,12 +121,12 @@ public class RecipesDao extends ConnectionDao {
 		return result;
 	}
 
-	private PreparedStatement listPatients(Connection con, RecipeRequest recipeRequest, String idUser)
+	private PreparedStatement listPatients(Connection con, RecipeRequest recipeRequest)
 			throws SQLException {
 		String sql = "SELECT DISTINCT p.Paciente_id, p.Nombre_paciente "
 				+ "FROM Recetas r "
 				+ "INNER JOIN Pacientes p ON p.Paciente_id = r.Paciente_id "
-				+ "WHERE Usuario_id = ? ";
+				+ "WHERE 1=1 ";
 		if (StringUtils.hasLength(recipeRequest.getId())) {
 			sql += "AND Receta_id = ? ";
 		}
@@ -139,7 +138,6 @@ public class RecipesDao extends ConnectionDao {
 		}
 		int i = 1;
 		PreparedStatement ps = con.prepareStatement(sql);
-		ps.setString(i++, idUser);
 		if (StringUtils.hasLength(recipeRequest.getId())) {
 			ps.setString(i++, recipeRequest.getId());
 		}
@@ -152,11 +150,11 @@ public class RecipesDao extends ConnectionDao {
 		return ps;
 	}
 
-	public List<Recipe> listDates(RecipeRequest recipeRequest, String idUser) {
+	public List<Recipe> listDates(RecipeRequest recipeRequest) {
 		List<Recipe> result = new ArrayList<>();
 
 		try (Connection conn = this.getConnection();
-				PreparedStatement ps = listDates(conn, recipeRequest, idUser);
+				PreparedStatement ps = listDates(conn, recipeRequest);
 				ResultSet rs = ps.executeQuery()) {
 			while (rs.next()) {
 				Recipe rec = new Recipe();
@@ -170,9 +168,9 @@ public class RecipesDao extends ConnectionDao {
 		return result;
 	}
 
-	private PreparedStatement listDates(Connection con, RecipeRequest recipeRequest, String idUser)
+	private PreparedStatement listDates(Connection con, RecipeRequest recipeRequest)
 			throws SQLException {
-		String sql = "SELECT DISTINCT Fecha_receta " + "FROM Recetas " + "WHERE Usuario_id = ?";
+		String sql = "SELECT DISTINCT Fecha_receta " + "FROM Recetas " + "WHERE 1=1 ";
 		if (StringUtils.hasLength(recipeRequest.getId())) {
 			sql += "AND Receta_id = ?";
 		}
@@ -181,7 +179,6 @@ public class RecipesDao extends ConnectionDao {
 		}
 		int i = 1;
 		PreparedStatement ps = con.prepareStatement(sql);
-		ps.setString(i++, idUser);
 		if (StringUtils.hasLength(recipeRequest.getId())) {
 			ps.setString(i++, recipeRequest.getId());
 		}
@@ -191,11 +188,11 @@ public class RecipesDao extends ConnectionDao {
 		return ps;
 	}
 
-	public ResponseRecipe get(RecipeRequest recipeRequest, String idUser) {
+	public ResponseRecipe get(RecipeRequest recipeRequest) {
 		ResponseRecipe result = new ResponseRecipe();
 
 		try (Connection conn = this.getConnection();
-				PreparedStatement ps = get(conn, recipeRequest, idUser);
+				PreparedStatement ps = get(conn, recipeRequest);
 				ResultSet rs = ps.executeQuery()) {
 			if (rs.next()) {
 				result.setId(rs.getString("Receta_id"));
@@ -212,7 +209,7 @@ public class RecipesDao extends ConnectionDao {
 		return result;
 	}
 	
-	private PreparedStatement get(Connection con, RecipeRequest recipeRequest, String idUser)
+	private PreparedStatement get(Connection con, RecipeRequest recipeRequest)
 			throws SQLException {
 		String sql = "select r.Receta_id, r.Paciente_id, r.Tomas_diarias, r.Fecha_receta, r.Estado_receta, r.Nombre_medicamento, p.Nombre_paciente " + 
 				" from Recetas r " +
@@ -227,6 +224,46 @@ public class RecipesDao extends ConnectionDao {
 		ps.setString(i++, recipeRequest.getId());
 		ps.setInt(i++, recipeRequest.getPatientId());
 		ps.setString(i++, recipeRequest.getDate());
+
+		return ps;
+	}
+
+	public boolean delete(String idRecipe) {
+		boolean result = false;
+		try (Connection conn = this.getConnection(); PreparedStatement ps = delete(conn, idRecipe)) {
+			int rows = ps.executeUpdate();
+			result = rows == 1;
+		} catch (Exception e) {
+			logger.error(e);
+		}
+		return result;
+	}
+	
+	private PreparedStatement delete(Connection con, String recipe) throws SQLException {
+		String sql = "DELETE FROM Recetas WHERE Receta_id = ? ";
+		PreparedStatement ps = con.prepareStatement(sql);
+		ps.setString(1, recipe);
+
+		return ps;
+	}
+
+	public boolean changeState(Integer state, String idRecipe) {
+		boolean result = false;
+		try (Connection conn = this.getConnection(); PreparedStatement ps = changeState(conn, idRecipe, state)) {
+			int rows = ps.executeUpdate();
+			result = rows == 1;
+		} catch (Exception e) {
+			logger.error(e);
+		}
+		return result;
+	}
+	
+	private PreparedStatement changeState(Connection con, String recipe, Integer state) throws SQLException {
+		String sql = "UPDATE Recetas SET Estado_receta = ? WHERE Receta_id = ? ";
+		PreparedStatement ps = con.prepareStatement(sql);
+		int i = 1;
+		ps.setString(i++, recipe);
+		ps.setInt(i++, state);
 
 		return ps;
 	}

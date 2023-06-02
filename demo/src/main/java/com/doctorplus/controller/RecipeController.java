@@ -97,7 +97,7 @@ public class RecipeController {
 		ResponseListRecipes result = new ResponseListRecipes();
 		String token = bearerToken.substring(7);
 		String idUser = usersDao.getIdByToken(token); 
-		List<Recipe> recipes = recipesDao.list(recipeRequest, idUser);
+		List<Recipe> recipes = recipesDao.list(recipeRequest);
 		result.setRecipes(recipes);
 		return result;
 	}
@@ -107,7 +107,7 @@ public class RecipeController {
 		ResponseListRecipes result = new ResponseListRecipes();
 		String token = bearerToken.substring(7);
 		String idUser = usersDao.getIdByToken(token); 
-		List<Recipe> recipes = recipesDao.listDates(recipeRequest, idUser);
+		List<Recipe> recipes = recipesDao.listDates(recipeRequest);
 		result.setRecipes(recipes);
 		return result;
 	}
@@ -117,7 +117,7 @@ public class RecipeController {
 		ResponseRecipe result = new ResponseRecipe();
 		String token = bearerToken.substring(7);
 		String idUser = usersDao.getIdByToken(token); 
-		result = recipesDao.get(recipeRequest, idUser);
+		result = recipesDao.get(recipeRequest);
 		
 		return result;
 	}
@@ -125,10 +125,8 @@ public class RecipeController {
 	@DeleteMapping("/recipe/delete/{idRecipe}")
 	public ResponseEntity<ResponseAction> get(@RequestHeader (name="Authorization") String bearerToken, @PathVariable  String idRecipe) {
 		String token = bearerToken.substring(7);
-		String idUser = usersDao.getIdByToken(token); 
 		
-		//boolean result = recipesDao.delete(idUser, idRecipe);
-		boolean result = true;
+		boolean result = recipesDao.delete(idRecipe);
 		if (result) {
 			return ResponseEntity.ok(new ResponseAction("ok", "Receta borrada correctamente: " + idRecipe));
 		}else {
@@ -139,12 +137,8 @@ public class RecipeController {
 	//@PutMapping("/recipe/change")
 	//public ResponseEntity<ResponseAction> change(@RequestHeader (name="Authorization") String bearerToken, @RequestBody RecipeRequest recipeRequest) {
 	@PutMapping("/recipe/change/{idRecipe}/{state}")
-	public ResponseEntity<ResponseAction> change(@RequestHeader (name="Authorization") String bearerToken, @PathVariable String idRecipe, @PathVariable Integer state) {
-		String token = bearerToken.substring(7);
-		String idUser = usersDao.getIdByToken(token); 
-		
-		//boolean result = recipesDao.changeState(recipeRequest.getState(), idRecipe);
-		boolean result = true;
+	public ResponseEntity<ResponseAction> change(@RequestHeader (name="Authorization") String bearerToken, @PathVariable String idRecipe, @PathVariable Integer state) {		
+		boolean result = recipesDao.changeState(state, idRecipe);
 		if (result) {
 			return ResponseEntity.ok(new ResponseAction("ok", "Receta cambiada de estado correctamente: " + idRecipe + " " + state));
 		}else {
