@@ -262,8 +262,8 @@ public class RecipesDao extends ConnectionDao {
 		String sql = "UPDATE Recetas SET Estado_receta = ? WHERE Receta_id = ? ";
 		PreparedStatement ps = con.prepareStatement(sql);
 		int i = 1;
-		ps.setString(i++, recipe);
 		ps.setInt(i++, state);
+		ps.setString(i++, recipe);
 
 		return ps;
 	}
