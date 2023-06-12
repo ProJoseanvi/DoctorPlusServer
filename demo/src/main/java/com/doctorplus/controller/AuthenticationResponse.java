@@ -1,7 +1,5 @@
 package com.doctorplus.controller;
 
-//Aquí codificamos la respuesta de Auth y el acceso al token
-
 public class AuthenticationResponse {
 	
 	private String username;

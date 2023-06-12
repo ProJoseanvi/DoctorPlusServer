@@ -1,20 +1,13 @@
 package com.doctorplus.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
-import java.text.SimpleDateFormat;
 
 import org.apache.logging.log4j.LogManager;
-
-
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,17 +15,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.doctorplus.dao.RecipesDao;
 import com.doctorplus.dao.UsersDao;
-import com.doctorplus.dto.User;
 import com.doctorplus.dto.Recipe;
-import com.doctorplus.service.InMemoryUsers;
-import com.doctorplus.service.JwtTokenService;
-import com.doctorplus.service.JwtUserDetailsService;
 
 //Este es el método pricipal que controla el login y autenticación del usuario
 
@@ -40,15 +27,6 @@ import com.doctorplus.service.JwtUserDetailsService;
 public class RecipeController {
 	
 	private static final Logger logger = LogManager.getLogger(RecipeController.class);
-	
-	@Autowired
-	private AuthenticationManager authenticationManager;
-	
-	@Autowired
-	private JwtUserDetailsService jwtUserDetailsService;
-
-	@Autowired
-	private JwtTokenService jwtTokenService;
 	
 	@Autowired
 	private UsersDao usersDao;
@@ -95,8 +73,6 @@ public class RecipeController {
 	@PostMapping("/recipe/ids")
 	public ResponseListRecipes getListIds(@RequestHeader (name="Authorization") String bearerToken, @RequestBody RecipeRequest recipeRequest) {
 		ResponseListRecipes result = new ResponseListRecipes();
-		String token = bearerToken.substring(7);
-		String idUser = usersDao.getIdByToken(token); 
 		List<Recipe> recipes = recipesDao.list(recipeRequest);
 		result.setRecipes(recipes);
 		return result;
@@ -105,8 +81,6 @@ public class RecipeController {
 	@PostMapping("/recipe/dates")
 	public ResponseListRecipes getListDates(@RequestHeader (name="Authorization") String bearerToken, @RequestBody RecipeRequest recipeRequest) {
 		ResponseListRecipes result = new ResponseListRecipes();
-		String token = bearerToken.substring(7);
-		String idUser = usersDao.getIdByToken(token); 
 		List<Recipe> recipes = recipesDao.listDates(recipeRequest);
 		result.setRecipes(recipes);
 		return result;
@@ -115,17 +89,13 @@ public class RecipeController {
 	@PostMapping("/recipe/get")
 	public ResponseRecipe get(@RequestHeader (name="Authorization") String bearerToken, @RequestBody RecipeRequest recipeRequest) {
 		ResponseRecipe result = new ResponseRecipe();
-		String token = bearerToken.substring(7);
-		String idUser = usersDao.getIdByToken(token); 
 		result = recipesDao.get(recipeRequest);
 		
 		return result;
 	}
 	
 	@DeleteMapping("/recipe/delete/{idRecipe}")
-	public ResponseEntity<ResponseAction> get(@RequestHeader (name="Authorization") String bearerToken, @PathVariable  String idRecipe) {
-		String token = bearerToken.substring(7);
-		
+	public ResponseEntity<ResponseAction> get(@RequestHeader (name="Authorization") String bearerToken, @PathVariable  String idRecipe) {		
 		boolean result = recipesDao.delete(idRecipe);
 		if (result) {
 			return ResponseEntity.ok(new ResponseAction("ok", "Receta borrada correctamente: " + idRecipe));
@@ -134,8 +104,6 @@ public class RecipeController {
 		}
 	}
 	
-	//@PutMapping("/recipe/change")
-	//public ResponseEntity<ResponseAction> change(@RequestHeader (name="Authorization") String bearerToken, @RequestBody RecipeRequest recipeRequest) {
 	@PutMapping("/recipe/change/{idRecipe}/{state}")
 	public ResponseEntity<ResponseAction> change(@RequestHeader (name="Authorization") String bearerToken, @PathVariable String idRecipe, @PathVariable Integer state) {		
 		boolean result = recipesDao.changeState(state, idRecipe);
@@ -145,12 +113,5 @@ public class RecipeController {
 			return ResponseEntity.ok(new ResponseAction("error", "Error al cambiar de estado la receta."));
 		}
 	}
-
-
-	private void getListRecipes(RecipeRequest recipeRequest) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	
 }

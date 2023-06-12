@@ -12,13 +12,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.doctorplus.dao.UsersDao;
 import com.doctorplus.dto.User;
-import com.doctorplus.service.InMemoryUsers;
 import com.doctorplus.service.JwtTokenService;
 import com.doctorplus.service.JwtUserDetailsService;
 
@@ -28,9 +26,6 @@ import com.doctorplus.service.JwtUserDetailsService;
 public class LoginController {
 	
 	private static final Logger logger = LogManager.getLogger(LoginController.class);
-
-	@Autowired
-	private InMemoryUsers inMemoryUsers;
 	
 	@Autowired
 	private AuthenticationManager authenticationManager;
@@ -43,19 +38,6 @@ public class LoginController {
 	
 	@Autowired
 	private UsersDao usersDao;
-	
-	//@PostMapping("/login")
-	public String login(@RequestParam("id") final String id,
-		    				 @RequestParam("password") final String password){
-		logger.info("user id:" + id);
-		
-		
-		User user = usersDao.getById(id);
-		
-		logger.info(user.toString());
-		
-		return "OK";
-	}
 	
 	@PostMapping("/login")
     public AuthenticationResponse authenticate(@RequestBody final AuthenticationRequest authenticationRequest) {

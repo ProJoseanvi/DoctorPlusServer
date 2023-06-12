@@ -20,7 +20,7 @@ public final class TokenAuthenticationFilter extends AbstractAuthenticationProce
 		super(requiresAuthenticationRequestMatcher);
 	}
 
-	private static final String BEARER = "Bearer";
+	//private static final String BEARER = "Bearer";
 	private static final String AUTHORIZATION = "Authorization";
 	
 
@@ -28,11 +28,11 @@ public final class TokenAuthenticationFilter extends AbstractAuthenticationProce
 	@Override
 	public Authentication attemptAuthentication(final HttpServletRequest request, final HttpServletResponse response) {
 		String param = request.getHeader(AUTHORIZATION);
-		if (StringUtils.isEmpty(param)) {
+		if (!StringUtils.hasLength(param)) {
 			param = request.getParameter("t");
 		}
 
-		if (StringUtils.isEmpty(param)) {
+		if (!StringUtils.hasLength(param)) {
 			new BadCredentialsException("Missing Authentication Token");
 		}
 

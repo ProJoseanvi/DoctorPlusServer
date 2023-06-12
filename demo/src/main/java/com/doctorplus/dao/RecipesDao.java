@@ -11,21 +11,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.doctorplus.controller.LoginController;
 import com.doctorplus.controller.RecipeRequest;
-import com.doctorplus.controller.RecipeSearchRequest;
 import com.doctorplus.controller.ResponseRecipe;
-import com.doctorplus.dto.Med;
-
-// Aquí codoficamos el DAO de la clase medicamentos, en este caso un GET para obtener mediante la conexión a la API lo que queremos de nuestra BD
-
-import com.doctorplus.dto.Medicamento;
 import com.doctorplus.dto.Patient;
 import com.doctorplus.dto.Recipe;
-import com.doctorplus.dto.User;
+
+
+// Aquí codoficamos el DAO de la clase medicamentos, en este caso un GET para obtener mediante la conexión a la API lo que queremos de nuestra BD
 
 @Repository
 public class RecipesDao extends ConnectionDao {

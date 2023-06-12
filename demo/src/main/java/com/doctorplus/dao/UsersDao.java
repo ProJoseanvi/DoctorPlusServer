@@ -8,14 +8,7 @@ import java.sql.SQLException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 
-import com.doctorplus.controller.LoginController;
-
-// Aquí codoficamos el DAO de la clase medicamentos, en este caso un GET para obtener mediante la conexión a la API lo que queremos de nuestra BD
-
-
-import com.doctorplus.dto.Medicamento;
 import com.doctorplus.dto.User;
 
 @Repository
