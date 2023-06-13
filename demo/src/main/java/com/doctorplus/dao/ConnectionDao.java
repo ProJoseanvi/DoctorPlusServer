@@ -8,6 +8,7 @@ import java.sql.SQLException;
 
 public abstract class ConnectionDao {
 	private final static String FILEPATH ="C:/database/BDproyecto.db";
+	//private final static String FILEPATH ="/db/BDproyecto.db";
 	
 	public ConnectionDao() {
 		try {
